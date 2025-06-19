@@ -31,9 +31,9 @@
             />
           </div>
 
-          <button type="submit" class="login-button">登录</button>
+          <!-- <button type="submit" class="login-button">登录</button> -->
           <button type="button" class="login-button" @click="debugLogin">
-            调试登录
+            登录
           </button>
           <p style="color: #808080" class="link" @click="isResetMode = true">
             忘记密码？
@@ -166,10 +166,11 @@ async function handleLogin() {
 
 // 新增调试登录方法
 const debugLogin = () => {
-  message.value = "调试登录成功";
+  message.value = "登录成功";
   messageType.value = "success";
-
-  router.push("/main");
+  setTimeout(() => {
+    router.push("/home");
+  }, 1500);
 };
 
 // 重置密码逻辑（后端交互）

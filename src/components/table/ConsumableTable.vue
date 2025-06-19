@@ -91,6 +91,7 @@ const emit = defineEmits([
   "OUTData",
 ]);
 
+// Define methods to handle events
 const onAdd = (item) => emit("addData", item);
 const onEdit = (index, updatedItem) => emit("editData", { index, updatedItem });
 const onDelete = (index) => emit("deleteData", index);
