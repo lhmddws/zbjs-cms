@@ -1,4 +1,5 @@
 <template>
+  <!-- 搜索表单与新增项目按钮 -->
   <form action="" method="post" class="search-form">
     <label
       >耗材名称<input type="text" name="name" placeholder="请输入耗材名称"
@@ -16,6 +17,7 @@
     <button type="reset" class="btn-reset">重置</button>
     <addpop @addData="onAdd" />
   </form>
+  <!-- 主表格内容，包括分页 -->
   <div class="main-table">
     <table>
       <thead>
@@ -77,20 +79,22 @@ import InboundRecordspop from "@/components/pop/InboundRecordspop.vue";
 import OutboundRecordspop from "@/components/pop/OutboundRecordspop.vue";
 import addpop from "@/components/pop/addpop.vue";
 defineProps({
-  data: Array,
-  allData: Array,
-  currentPage: Number,
-  pageSize: Number,
+  data: Array,           // 当前页表格数据
+  allData: Array,        // 所有数据（用于分页）
+  currentPage: Number,   // 当前页码
+  pageSize: Number,      // 每页显示数量
 });
 
+// 定义可触发的事件
 const emit = defineEmits([
-  "addData",
-  "editData",
-  "deleteData",
-  "INData",
-  "OUTData",
+  "addData",    // 新增数据事件
+  "editData",   // 编辑数据事件
+  "deleteData", // 删除数据事件
+  "INData",     // 入库记录事件
+  "OUTData",    // 出库记录事件
 ]);
 
+// 子组件事件响应函数
 const onAdd = (item) => emit("addData", item);
 const onEdit = (index, updatedItem) => emit("editData", { index, updatedItem });
 const onDelete = (index) => emit("deleteData", index);
@@ -100,6 +104,7 @@ const onOUT = (index, num) => emit("OUTData", { index, num });
 </script>
 
 <style scoped>
+/* 表格主区域 */
 .main-table {
   margin-top: 20px;
 }
@@ -134,6 +139,8 @@ thead tr {
   text-align: center;
   font-size: 0.87rem;
 }
+
+/* 表头样式 */
 th {
   background-color: #4a88b1;
   color: #fff;
@@ -174,16 +181,21 @@ td {
   justify-content: center;
   align-items: center;
 }
+
+/* 分页组件容器 */
 .pagination-wrapper {
-  width: 94%;
+  width: 100%;
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
 }
+
+/* 表单按钮样式 */
 .btn-search {
   background-color: #3388ff;
 }
 
+/* 表格输入表单样式 */
 .search-form {
   margin-top: 30px;
   width: 94%;
@@ -194,6 +206,8 @@ td {
   margin-right: 20px;
   white-space: nowrap;
 }
+
+/* 表单按钮样式 */
 button {
   width: 6vw;
   height: 30px;
@@ -204,6 +218,8 @@ button {
   background-color: #4a88b1;
   cursor: pointer;
 }
+
+/* 表单输入框样式 */
 input {
   width: 9vw;
   height: 30px;

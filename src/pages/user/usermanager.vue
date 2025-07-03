@@ -3,90 +3,83 @@ import { ref, computed } from "vue";
 import addpop from "@/components/pop/useraddpop.vue";
 import edit from "@/components/pop/usereditpop.vue";
 import { useRouter } from "vue-router";
-import { resetPassword } from "@/api/index";
-import { Refresh } from "@element-plus/icons-vue";
-function handleResetPassword(jobId) {
-  if (!jobId) {
-    alert("无效的工号");
+import { getUserlist, updateUser } from "@/api/user";
+import { Refresh, Delete } from "@element-plus/icons-vue";
+import { deleteUser } from "@/api/user";
+import { onMounted } from "vue";
+
+//初始化时获取用户列表
+
+//获取请求数据
+
+const totalItems = ref(0);
+const allData = ref([]); // 存储所有用户数据
+
+const currentPage = ref(1);
+const pageSize = ref(10);
+
+const fetchUserList = () => {
+  getUserlist({ page: currentPage.value })
+    .then((res) => {
+      const raw = res.data.data.rows || [];
+      totalItems.value = res.data.data.total || 0;
+      allData.value = raw.map((item) => ({
+        id: item.id,
+        name: item.name || "",
+        account: item.account || "",
+        phone: item.phone || "",
+      }));
+    })
+    .catch((err) => {
+      console.error("获取用户列表失败：", err);
+    });
+};
+const deleteData=function (index) {
+  let result = window.confirm("您是否要执行此操作？");
+  if (result) {
+    deleteUser({id:allData.value[index].id}).then(res=>{
+      if(res.data.code==1){
+        alert("删除成功")
+      }else{
+        alert("删除失败")
+      }
+    })
+  }
+}
+onMounted(() => {
+  fetchUserList();
+});
+
+const pagedData = computed(() => {
+  return allData.value;
+});
+
+function handleResetPassword(item) {
+  if (!item || !item.account || !item.id) {
+    alert("无效的用户信息");
     return;
   }
-  const confirmed = window.confirm(`确认为工号 ${jobId} 重置密码？`);
+  const confirmed = window.confirm(`确认为工号 ${item.account} 重置密码？`);
   if (confirmed) {
-    resetPassword({ jobId })
+    updateUser({ id: item.id, account: item.account, password: "12345678" })
       .then(() => {
         alert("密码重置成功");
       })
       .catch((error) => {
         console.error("重置密码失败:", error);
-        const msg =
-          error?.response?.data?.message || "密码重置失败";
+        const msg = error?.response?.data?.message || "密码重置失败";
         alert(msg);
       });
   }
 }
 const router = useRouter();
-const allData = ref([
-  { id: 1, name: "张三", jobId: "A001", phone: "13800000001" },
-  { id: 2, name: "李四", jobId: "A002", phone: "13800000002" },
-  { id: 3, name: "王五", jobId: "A003", phone: "13800000003" },
-  { id: 4, name: "赵六", jobId: "A004", phone: "13800000004" },
-  { id: 5, name: "钱七", jobId: "A005", phone: "13800000005" },
-  { id: 6, name: "孙八", jobId: "A006", phone: "13800000006" },
-  { id: 7, name: "周九", jobId: "A007", phone: "13800000007" },
-  { id: 8, name: "吴十", jobId: "A008", phone: "13800000008" },
-  { id: 9, name: "郑十一", jobId: "A009", phone: "13800000009" },
-  { id: 10, name: "冯十二", jobId: "A010", phone: "13800000010" },
-  { id: 11, name: "陈十三", jobId: "A011", phone: "13800000011" },
-  { id: 12, name: "褚十四", jobId: "A012", phone: "13800000012" },
-]);
-// 当前分页参数
-const currentPage = ref(1);
-const pageSize = ref(10);
-// 每页显示的条数
-const totalItems = computed(() => allData.value.length);
 
-// 分页后的数据
-const pagedData = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  return allData.value.slice(start, start + pageSize.value);
-});
-
-// 页码变更
-const handlePageChange = (page) => {
-  currentPage.value = page;
+const handlePageChange = (newPage) => {
+  currentPage.value = newPage;
+  fetchUserList();
 };
 
-// 添加用户数据
-// const userCounter = ref(allData.value.length + 1)
-function addData() {
-  const dialog = document.querySelectorAll(".addpop label");
-  allData.value.unshift({
-    id: allData.value.length + 1,
-    name: dialog[0].children[0].value,
-    jobId: dialog[1].children[0].value,
-  });
-  // userCounter.value++
-
-  // 如果当前页是最后一页，可能需要刷新视图
-  // 自动跳转到最后一页
-  currentPage.value = Math.floor(allData.value.length / pageSize.value);
-}
-// 修改数据
-function editdata(index) {
-  const dialog = document.querySelectorAll(".editpop label");
-  allData.value[index + 1 + (currentPage.value - 1) * 10 - 1].name =
-    dialog[0].children[0].value;
-  allData.value[index + 1 + (currentPage.value - 1) * 10 - 1].jobId =
-    dialog[1].children[0].value;
-}
-
-//删除数据
-function deleteData(index) {
-  let result = window.confirm("您是否要执行此操作？");
-  if (result) {
-    allData.value.splice(index, 1);
-  }
-}
+// 每页显示的条数
 
 const handlePrint = () => {
   router.push("/home");
@@ -102,7 +95,7 @@ const handlePrint = () => {
           >教师姓名<input type="text" name="name" placeholder="请输入教师姓名"
         /></label>
         <label
-          >工号<input type="text" name="jobId" placeholder="请输入工号"
+          >工号<input type="text" name="account" placeholder="请输入工号"
         /></label>
       </div>
       <div class="form-right">
@@ -115,7 +108,7 @@ const handlePrint = () => {
       <table>
         <thead>
           <tr>
-            <th width="10%">ID</th>
+            <th width="10%">序号</th>
             <th width="20%">教师姓名</th>
             <th width="20%">工号</th>
             <th width="30%">联系方式</th>
@@ -130,14 +123,14 @@ const handlePrint = () => {
           >
             <td>{{ index + 1 + (currentPage - 1) * 10 }}</td>
             <td>{{ item.name }}</td>
-            <td>{{ item.jobId }}</td>
+            <td>{{ item.account }}</td>
             <td>{{ item.phone }}</td>
             <td>
               <div class="operate">
                 <edit :edit="item" :id="index" @editData="editdata"></edit>
                 <span
                   class="btn-delete"
-                  @click="handleResetPassword(item.jobId)"
+                  @click="handleResetPassword(item)"
                 >
                   <el-icon><Refresh /></el-icon>重置密码
                 </span>
@@ -162,7 +155,7 @@ const handlePrint = () => {
       <el-pagination
         background
         layout="total, prev, pager, next, jumper"
-        :total="allData.length"
+        :total="totalItems"
         :page-size="pageSize"
         :current-page="currentPage"
         :page-sizes="[5, 10, 20]"

@@ -4,7 +4,7 @@
     <div class="digital back" :class="_textClass(backTextFromData)"></div>
   </div>
 </template>
-<script setup lang="ts">
+<script setup >
 import { ref } from "vue"
 
 const props = defineProps({

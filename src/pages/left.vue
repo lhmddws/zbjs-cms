@@ -3,18 +3,31 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import clock from "@/components/clock.vue";
 
+// 统一引入所有图标
+import home from "@/assets/icons/home.png";
+import homeAct from "@/assets/icons/home_act.png";
+import material from "@/assets/icons/material.png";
+import materialAct from "@/assets/icons/material_act.png";
+import inboundRecords from "@/assets/icons/InboundRecords.png";
+import inboundRecordsAct from "@/assets/icons/InboundRecords_act.png";
+import outboundRecords from "@/assets/icons/OutboundRecords.png";
+import outboundRecordsAct from "@/assets/icons/OutboundRecords_act.png";
+import schoolBadge from "@/assets/icons/School_badge.png";
+import next from "@/assets/icons/next.png";
+import nextAct from "@/assets/icons/next_act.png";
+
 const router = useRouter();
 
 const Nav = ref([
   {
-    img1: "/home.png",
-    img2: "/home_act.png",
+    img1: home,
+    img2: homeAct,
     title: "系统首页",
     path: "/home",
   },
   {
-    img1: "/material.png",
-    img2: "/material_act.png",
+    img1: material,
+    img2: materialAct,
     title: "耗材信息",
     path: "",
     kid: [
@@ -24,14 +37,14 @@ const Nav = ref([
     ],
   },
   {
-    img1: "/InboundRecords.png",
-    img2: "/InboundRecords_act.png",
+    img1: inboundRecords,
+    img2: inboundRecordsAct,
     title: "入库管理",
     path: "/InboundRecords",
   },
   {
-    img1: "/OutboundRecords.png",
-    img2: "/OutboundRecords_act.png",
+    img1: outboundRecords,
+    img2: outboundRecordsAct,
     title: "出库管理",
     path: "/OutboundRecords",
   },
@@ -76,7 +89,7 @@ onMounted(() => {
     menuOption[i].classList.remove("active");
     menuOption[i].children[0].children[1].classList.remove("fontcolor");
     menuOption[i].children[0].children[0].src = Nav.value[i].img1;
-    menuOption[i].children[0].children[2].src = "/next.png";
+    menuOption[i].children[0].children[2].src = next;
     menuOption[i].children[0].children[2].classList.remove("rotate");
   }
 
@@ -87,7 +100,7 @@ onMounted(() => {
       item.classList.add("active");
       item.children[0].children[1].classList.add("fontcolor");
       item.children[0].children[0].src = Nav.value[i].img2;
-      item.children[0].children[2].src = "/next_act.png";
+      item.children[0].children[2].src = nextAct;
       break;
     }
   }
@@ -101,19 +114,19 @@ onMounted(() => {
       mItem.classList.remove("active");
       mLink.children[1].classList.remove("fontcolor");
       mLink.children[0].src = Nav.value[j].img1;
-      mLink.children[2].src = "/next.png";
+      mLink.children[2].src = next;
       mLink.children[2].classList.remove("rotate");
 
       if (mSub) {
         mSub.dataset.expanded = "false";
         mSub.style.height = "0px";
-        Array.from(mSub.children).forEach(subLi => {
+        Array.from(mSub.children).forEach((subLi) => {
           subLi.classList.remove("active");
           const subLink = subLi.querySelector("a");
           if (subLink) {
             subLink.children[0].classList.remove("fontcolor");
             const icon = subLink.querySelector(".next");
-            if (icon) icon.src = "/next.png";
+            if (icon) icon.src = next;
           }
         });
       }
@@ -143,7 +156,7 @@ onMounted(() => {
         const link = item.children[0];
         link.children[1].classList.remove("fontcolor");
         link.children[0].src = Nav.value[i].img1;
-        link.children[2].src = "/next.png";
+        link.children[2].src = next;
         link.children[2].classList.remove("rotate");
         return;
       }
@@ -158,14 +171,14 @@ onMounted(() => {
         const link = item.children[0];
         link.children[1].classList.add("fontcolor");
         link.children[0].src = Nav.value[i].img2;
-        link.children[2].src = "/next_act.png";
+        link.children[2].src = nextAct;
         link.children[2].classList.add("rotate");
       } else {
         item.classList.add("active");
         const link = item.children[0];
         link.children[1].classList.add("fontcolor");
         link.children[0].src = Nav.value[i].img2;
-        link.children[2].src = "/next_act.png";
+        link.children[2].src = nextAct;
         link.children[2].classList.add("rotate");
       }
     });
@@ -186,7 +199,7 @@ onMounted(() => {
           const link = item.children[0];
           link.children[1].classList.add("fontcolor");
           link.children[0].src = Nav.value[i].img2;
-          link.children[2].src = "/next_act.png";
+          link.children[2].src = nextAct;
           link.children[2].classList.add("rotate");
           submenu.style.height = submenu.scrollHeight + "px";
           submenu.dataset.expanded = "true";
@@ -197,7 +210,7 @@ onMounted(() => {
           if (subLink) {
             subLink.children[0].classList.add("fontcolor");
             const icon = subLink.querySelector(".next");
-            if (icon) icon.src = "/next_act.png";
+            if (icon) icon.src = nextAct;
           }
         });
       }
@@ -209,20 +222,20 @@ onMounted(() => {
 <template>
   <div id="leftNav">
     <div class="user">
-      <img src="/School_badge.png" alt="" class="Picture" />
+      <img :src="schoolBadge" alt="" class="Picture" />
     </div>
     <ul class="menu">
       <li v-for="(item, index) in Nav" :key="index">
         <router-link :to="item.path">
           <img class="icon" :src="item.img1" />
           <span class="title">{{ item.title }}</span>
-          <img src="/next.png" class="next" />
+          <img :src="next" class="next" />
         </router-link>
         <ul v-if="item.kid && item.kid.length > 0" class="submenu">
           <li v-for="(item1, index) in item.kid" :key="index">
             <router-link :to="item1.path">
               <span class="title">{{ item1.title }}</span>
-              <img src="/next.png" class="next" />
+              <img :src="next" class="next" />
             </router-link>
           </li>
         </ul>

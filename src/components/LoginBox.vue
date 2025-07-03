@@ -12,12 +12,12 @@
         <!-- 登录表单 -->
         <form v-if="!isResetMode" @submit.prevent="handleLogin">
           <div class="input-group">
-            <label for="username">用户名</label>
+            <label for="account">工号</label>
             <input
-              v-model="username"
-              id="username"
+              v-model="account"
+              id="account"
               type="text"
-              placeholder="请输入用户名"
+              placeholder="请输入工号"
             />
           </div>
 
@@ -85,14 +85,16 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { resetPassword, login } from "@/api/index";
+import { login } from "@/api/login";
+import { useUserStore } from "@/stores/user";
 const router = useRouter();
+const userStore = useUserStore();
 
 // 模式切换
 const isResetMode = ref(false);
 
 // 登录信息
-const username = ref("");
+const account = ref("");
 const password = ref("");
 
 // 重置密码表单
@@ -108,42 +110,51 @@ const messageType = ref(""); // 'success' 或 'error'
 
 // 新的登录逻辑，调用 login API
 async function handleLogin() {
-  if (!username.value || !password.value) {
-    message.value = "请输入用户名和密码";
+  if (!account.value || !password.value) {
+    message.value = "请输入工号和密码";
     messageType.value = "error";
     return;
   }
 
   const invalidCharPattern = /[^a-zA-Z0-9_]/;
-  if (username.value.length < 4 || password.value.length < 4) {
-    message.value = "用户名和密码长度不得少于4位";
+  if (account.value.length < 4 || password.value.length < 4) {
+    message.value = "工号和密码长度不得少于4位";
     messageType.value = "error";
     return;
   }
 
   if (
-    invalidCharPattern.test(username.value) ||
+    invalidCharPattern.test(account.value) ||
     invalidCharPattern.test(password.value)
   ) {
-    message.value = "用户名和密码只能包含字母、数字或下划线";
+    message.value = "工号和密码只能包含字母、数字或下划线";
     messageType.value = "error";
     return;
   }
 
   try {
     const response = await login({
-      username: username.value,
+      account: account.value,
       password: password.value,
     });
 
-    if (response && response.success) {
-      message.value = `欢迎，${response.data.username}`;
+    if (response.data.msg == "success") {
+      // 登录成功后的提示信息
+      message.value = `欢迎，${response.data.data.name}`;
+      // 设置提示类型为成功
       messageType.value = "success";
 
-      localStorage.setItem(
-        "is_admin",
-        response.data.is_admin === 0 ? "true" : "false"
-      );
+      // 解构后端返回的数据
+      const { account, token, name, isAdmin, id } = response.data.data;
+
+      // 存入 Pinia 状态管理
+      userStore.id = id;
+      userStore.token = token;
+      userStore.account = account;
+      userStore.name = name;
+      userStore.is_admin = isAdmin === 0;
+
+      userStore.persistToLocalStorage();
 
       const box = document.querySelector(".login-box");
       if (box) {
@@ -154,7 +165,7 @@ async function handleLogin() {
         router.push("/main");
       }, 1000);
     } else {
-      message.value = response.message || "用户名或密码错误";
+      message.value = response.message || "工号或密码错误";
       messageType.value = "error";
     }
   } catch (error) {
@@ -169,49 +180,24 @@ const debugLogin = () => {
   message.value = "调试登录成功";
   messageType.value = "success";
 
+  // 调试用默认数据
+  const mockData = {
+    id: 0,
+    token: "debug-token",
+    account: "debug_user",
+    name: "调试用户",
+    is_admin: true,
+  };
+
+  userStore.id = mockData.id;
+  userStore.token = mockData.token;
+  userStore.account = mockData.account;
+  userStore.name = mockData.name;
+  userStore.is_admin = mockData.is_admin;
+
+  userStore.persistToLocalStorage();
+
   router.push("/main");
-};
-
-// 重置密码逻辑（后端交互）
-const handlePasswordReset = async () => {
-  const { teacherID, newPassword, confirmPassword } = resetForm.value;
-
-  if (!teacherID || !newPassword || !confirmPassword) {
-    message.value = "请填写完整信息";
-    messageType.value = "error";
-    return;
-  }
-
-  if (newPassword.length < 8) {
-    message.value = "密码不能少于8位";
-    messageType.value = "error";
-    return;
-  }
-
-  if (newPassword !== confirmPassword) {
-    message.value = "两次密码不一致";
-    messageType.value = "error";
-    return;
-  }
-
-  try {
-    const res = await resetPassword({
-      account: teacherID,
-      password: newPassword,
-    });
-
-    if (res.data.success) {
-      message.value = "密码重置成功";
-      messageType.value = "success";
-      isResetMode.value = false;
-    } else {
-      message.value = res.data.message || "重置失败";
-      messageType.value = "error";
-    }
-  } catch (error) {
-    message.value = "重置请求失败，请稍后重试";
-    messageType.value = "error";
-  }
 };
 </script>
 

@@ -1,10 +1,13 @@
 <template>
+  <!-- 页面主容器 -->
   <div id="InboundRecords">
+    <!-- 标题栏 -->
     <div class="title-name">
       出库管理<span class="en">Outbound Warehouse Management</span>
     </div>
+    <!-- 内容区域 -->
     <div class="container">
-      <!--搜索过滤区域 -->
+      <!-- 搜索过滤区域 -->
       <el-row :gutter="25">
         <el-col :span="5">
           <el-form-item label="物品名称">
@@ -57,7 +60,7 @@
         </el-col>
       </el-row>
 
-      <!-- 表格区域 -->
+      <!-- 表格展示区域 -->
       <div class="table-container" ref="printContent">
         <el-table
           :data="
@@ -123,7 +126,7 @@
         </el-table>
       </div>
 
-      <!-- 分页区域 -->
+      <!-- 分页与打印区域 -->
       <div class="pagination-container-flex">
         <el-button
           type="primary"
@@ -150,19 +153,26 @@
 export default {
   data() {
     return {
+      // 当前搜索条件（用于实际筛选）
       searchForm: {
         itemName: "",
         type: "",
         dateRange: [],
         depositor: "",
       },
+      // 表格数据源
       tableData: [],
+      // 所有类型选项（由数据动态生成）
       uniqueTypes: [],
+      // 当前分页页码
       currentPage: 1,
+      // 每页数据条数
       pageSize: 10,
+      // 是否应用了搜索
       isSearchApplied: false,
+      // 原始数据备份（用于重置）
       originalTableData: [],
-      // 添加临时搜索条件，用于存储用户输入但不立即应用
+      // 临时表单，用于等待点击“搜索”才应用
       tempSearchForm: {
         itemName: "",
         type: "",
@@ -172,6 +182,7 @@ export default {
     };
   },
   computed: {
+    // 根据 searchForm 条件筛选数据
     filteredTableData() {
       let data = [...this.tableData];
 
@@ -233,6 +244,7 @@ export default {
     this.fetchData();
   },
   methods: {
+    // 加载初始数据
     fetchData() {
       const alDate = [
         {
@@ -460,12 +472,14 @@ export default {
       this.originalTableData = [...alDate];
       this.uniqueTypes = [...new Set(alDate.map((item) => item.type))];
     },
+    // 点击“搜索”按钮应用筛选
     handleSearch() {
       // 将临时搜索条件应用到searchForm
       this.searchForm = { ...this.tempSearchForm };
       this.isSearchApplied = true;
       this.currentPage = 1;
     },
+    // 点击“打印”按钮，打开打印窗口
     handlePrint() {
       // 创建打印专用表格
       const printTable = document.createElement("table");
@@ -564,6 +578,7 @@ export default {
         this.$message.error("无法打开打印窗口。请检查浏览器设置。");
       }
     },
+    // 点击“重置”按钮清空筛选条件
     handleReset() {
       this.tempSearchForm = {
         itemName: "",
@@ -576,9 +591,11 @@ export default {
       this.currentPage = 1;
       this.tableData = [...this.originalTableData];
     },
+    // 页容量变化回调
     handleSizeChange(val) {
       this.pageSize = val;
     },
+    // 页码变更回调
     handleCurrentChange(val) {
       this.currentPage = val;
     },
@@ -587,10 +604,13 @@ export default {
 </script>
 
 <style scoped>
+/* 全局基础样式重置 */
 * {
   margin: 0;
   padding: 0;
 }
+
+/* 页面根节点容器 */
 #InboundRecords {
   width: 100%;
   height: 100%;
@@ -598,39 +618,53 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
+/* 页面整体内容区域 */
 .container {
   padding: 25px;
   width: 94%;
   /* height: 90vh; */
 }
+
+/* 表格行样式 */
 .el-table tr {
   height: 60px;
 }
+
+/* 分页信息容器（若有） */
 .pagination-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
+/* 表格容器 */
+.table-container {
+  width: 100%;
+  /* height: 100%; 确保容器高度占满可用空间 */
+  display: flex; /* 使用Flexbox布局 */
+}
+
+/* 表格本体样式 */
 .el-table {
   margin-top: 20px; /* 如果需要，可以进一步调整表格的顶部距离 */
+  flex: 1; /* 让表格占满容器的剩余空间 */
 }
+
+/* 分页信息右侧样式（若有） */
 .pagination-info {
   margin-right: 20px;
 }
+
+/* 分页信息容器 */
 .pagination-container-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
 }
-.table-container {
-  width: 100%;
-  /* height: 100%; 确保容器高度占满可用空间 */
-  display: flex; /* 使用Flexbox布局 */
-}
-.el-table {
-  flex: 1; /* 让表格占满容器的剩余空间 */
-}
+
+/* 顶部标题栏样式 */
 .title-name {
   box-shadow: 2px 2px 7px -1px black;
   border-radius: 5px;
@@ -643,22 +677,26 @@ export default {
   color: #fff;
   background: linear-gradient(to right, #4a88b1, #f3f2f9) no-repeat;
 }
+
+/* 英文副标题样式 */
 .en {
   font-size: 0.9em;
   color: #fff;
   margin-left: 10px;
 }
+
+/* 打印按钮样式 */
 .print-button {
   background-color: white;
   color: black;
   border: 1px solid #dcdfe6; /* 默认边框颜色 */
   width: 100px;
 }
-
 .print-button:hover {
   border-color: #c0c4cc; /* 悬停时的边框颜色 */
 }
 
+/* 打印模式下显示设置 */
 @media print {
   body * {
     visibility: hidden;

@@ -1,6 +1,11 @@
 <script setup>
+// 引入 Vue 响应式和计算属性相关 API
 import { ref, computed } from "vue";
+
+// 引入自定义表格组件
 import ConsumableTable from "@/components/table/ConsumableTable.vue";
+
+// 所有耗材数据列表
 const allData = ref([
   { id: 1, name: "耗材1", type: "规格1", unit: "单位1", price: 10, num: 100 },
   { id: 2, name: "耗材2", type: "规格2", unit: "单位2", price: 20, num: 200 },
@@ -36,22 +41,24 @@ const allData = ref([
     num: 1200,
   },
 ]);
-// 当前分页参数
+// 当前分页页码
 const currentPage = ref(1);
+
+// 每页显示数量
 const pageSize = ref(10);
 
-// 分页后的数据
+// 计算当前页应显示的数据
 const pagedData = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   return allData.value.slice(start, start + pageSize.value);
 });
 
-// 页码变更
+// 页码变更处理函数
 const handlePageChange = (page) => {
   currentPage.value = page;
 };
 
-// 添加用户数据
+// 添加新耗材数据
 function addData(newItem) {
   allData.value.unshift({
     id: allData.value.length + 1,
@@ -63,7 +70,8 @@ function addData(newItem) {
   });
   currentPage.value = Math.floor(allData.value.length / pageSize.value) + 1;
 }
-// 修改数据
+
+// 修改指定耗材数据
 function editdata({ index, newItem }) {
   const realIndex = index + (currentPage.value - 1) * pageSize.value;
   if (allData.value[realIndex]) {
@@ -74,7 +82,8 @@ function editdata({ index, newItem }) {
     allData.value[realIndex].num = newItem.num;
   }
 }
-//删除数据
+
+// 删除指定数据项
 function deleteData(index) {
   let result = window.confirm("您是否要执行此操作？");
   if (result) {
@@ -82,7 +91,8 @@ function deleteData(index) {
     allData.value.splice(realIndex, 1);
   }
 }
-//出库
+
+// 出库操作
 function outdata({ index, amount }) {
   const realIndex = index + (currentPage.value - 1) * pageSize.value;
   if (allData.value[realIndex]) {
@@ -90,7 +100,8 @@ function outdata({ index, amount }) {
       allData.value[realIndex].num - amount;
   }
 }
-//入库
+
+// 入库操作
 function indata({ index, amount }) {
   const realIndex = index + (currentPage.value - 1) * pageSize.value;
   if (allData.value[realIndex]) {
@@ -100,10 +111,14 @@ function indata({ index, amount }) {
 }
 </script>
 <template>
+  <!-- 耗材管理主视图 -->
   <div id="teach">
+    <!-- 标题栏 -->
     <div class="title-name">
       大赛耗材<span class="en">Competition consumables</span>
     </div>
+
+    <!-- 耗材数据表格组件，支持增删改查、分页 -->
     <ConsumableTable
       :data="pagedData"
       :all-data="allData"
@@ -118,10 +133,12 @@ function indata({ index, amount }) {
   </div>
 </template>
 <style scoped>
+  /* 全局初始化样式 */
   *{
     margin: 0;
     padding: 0; 
   }
+  /* teach 页面主容器样式 */
   #teach{
     width: 100%;
     height: 100%;
@@ -129,6 +146,7 @@ function indata({ index, amount }) {
     flex-direction: column;
     align-items: center;
   }
+  /* 页面标题样式 */
   .title-name{
     white-space:nowrap;
     box-shadow: 2px 2px 7px -1px black;
@@ -142,11 +160,13 @@ function indata({ index, amount }) {
     color: #fff;
     background: linear-gradient(to right, #4A88B1, #F3F2F9) no-repeat;
   }
+  /* 英文副标题样式 */
   .en{
     font-size: 0.9em;
     color: #fff;
     margin-left: 10px;
     }
+    /* 分页区域容器样式 */
     .pagination-wrapper{
       width: 94%;
       margin-top: 20px;

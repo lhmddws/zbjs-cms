@@ -1,10 +1,29 @@
-<script setup lang="ts">
+<script setup >
 import { ref } from "vue";
+import { addUser, changePassword } from  "@/api/user"; 
 defineEmits(["addData"]);
 // 定义对话框的可见性
+const name = ref("");
+const account = ref("");
+const phone = ref("");
 let dialogVisible = ref(false);
-function addData() {
-  dialogVisible.value = false;
+
+
+async function addData() {
+  try {
+    await addUser({
+      name: name.value,
+      account: account.value,
+      phone: phone.value,
+      password :12345678, 
+    });
+    dialogVisible.value = false; 
+    location.reload(); // 刷新页面以显示最新数据
+    
+  } catch (error) {
+    console.error("添加用户失败：", error);
+    // 可根据需要使用 ElMessage 显示提示
+  }
 }
 </script>
 <template>
@@ -15,29 +34,27 @@ function addData() {
       <label
         >用户名（工号）<input
           type="text"
-          name="jobId"
+          name="account"
+          v-model="account"
           placeholder="请输入用户名（工号）"
       /></label>
       <label
-        >教师姓名<input type="text" name="name" placeholder="请输入"
+        >教师姓名<input type="text" name="name"
+        v-model="name"
+        placeholder="请输入"
       /></label>
       <label
         >联系方式<input
           type="text"
           name="phone"
+          v-model="phone"
           placeholder="请输入联系方式（手机号）"
       /></label>
     </form>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button
-          type="primary"
-          @click="
-            addData();
-            $emit('addData');
-          "
-        >
+        <el-button type="primary" @click="addData()">
           确定
         </el-button>
       </div>

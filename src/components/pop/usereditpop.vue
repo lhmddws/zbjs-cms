@@ -1,8 +1,36 @@
 <script setup lang="ts">
-import { ref } from "vue";
-defineProps(["edit", "id"]);
-defineEmits(["editData"]);
+import { ref, watch } from "vue";
+import { updateUser } from "@/api/user";
+const props = defineProps(["edit", "id"]);
+const emit = defineEmits(["editData"]);
 const dialogVisible = ref(false);
+
+const userForm = ref({
+  id: 0,
+  account: "",
+  name: "",
+  phone: "",
+});
+
+watch(
+  () => props.edit,
+  (newVal) => {
+    userForm.value = { ...newVal };
+  },
+  { immediate: true }
+);
+
+const submitEdit = () => {
+  updateUser(userForm.value)
+    .then(() => {
+      dialogVisible.value = false;
+      // 通知父组件刷新
+      // location.reload();
+    })
+    .catch((err) => {
+      console.error("更新用户失败", err);
+    });
+};
 </script>
 <template>
   <span @click="dialogVisible = true" width="80px" class="btn-edit">
@@ -16,37 +44,29 @@ const dialogVisible = ref(false);
       <label
         >用户名（工号）<input
           type="text"
-          name="jobId"
+          name="account"
           placeholder="请输入用户名（工号）"
-          :value="edit.jobId"
+          v-model="userForm.account"
       /></label>
       <label
         >教师姓名<input
           type="text"
           name="name"
           placeholder="请输入教师姓名"
-          :value="edit.name"
+          v-model="userForm.name"
       /></label>
       <label
         >联系方式<input
           type="text"
           name="phone"
           placeholder="请输入联系方式"
-          :value="edit.phone"
+          v-model="userForm.phone"
       /></label>
     </form>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button
-          type="primary"
-          @click="
-            dialogVisible = false;
-            $emit('editData', id);
-          "
-        >
-          确定
-        </el-button>
+        <el-button type="primary" @click="submitEdit"> 确定 </el-button>
       </div>
     </template>
   </el-dialog>

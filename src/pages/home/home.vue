@@ -1,5 +1,7 @@
 <script setup>
+// 引入 Vue 的响应式和生命周期钩子
 import { ref,onMounted } from 'vue'
+// 所有申请记录数据（静态模拟）
 const allData=ref([
     {name:'教师1',hcname:'耗材1',type:'规格2',unit:'单位2',num:200},
     {name:'教师2',hcname:'耗材2',type:'规格2',unit:'单位2',num:200},
@@ -13,17 +15,20 @@ const allData=ref([
     {name:'教师10',hcname:'耗材10',type:'规格2',unit:'单位2',num:200},
     {name:'教师11',hcname:'耗材11',type:'规格2',unit:'单位2',num:200}
   ])
+// 审核状态选项
 const uniqueTypes = ref([
   '待审核',
   '审核通过',
   '审核未通过'
 ])
+// 搜索表单数据绑定对象
 const tempSearchForm= ref({
         itemName: "",
         state: "",
         dateRange: [],
         Recipient: "",
       })
+// 页面挂载后，根据时间段设置问候语
 onMounted(() => {
   const welcome= document.querySelector('.welcome')
   const data = new Date()
@@ -40,8 +45,10 @@ onMounted(() => {
 })
 </script>
 <template>
+  <!-- 欢迎语区域（根据时间动态更新） -->
   <div id="home">
     <div class="welcome"></div>
+    <!-- 搜索条件区域 -->
     <div class="msg-search">
       <el-row :gutter="25">
         <el-col :span="5">
@@ -94,9 +101,11 @@ onMounted(() => {
         </el-col>
       </el-row>
     </div>
+    <!-- 申请记录展示区域 -->
     <div id="message">
       <div class="title-name">申请记录</div>
       <div class="main-table">
+      <!-- 表格渲染每条记录 -->
       <table>
         <tbody>
           <tr v-for="(item,index) in allData" :key="item.id">
@@ -120,6 +129,7 @@ onMounted(() => {
     margin: 0;
     padding: 0;
   }
+  /* 页面根容器 */
   #home{
     width: 100%;
     height: 100%;
@@ -127,6 +137,7 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
   }
+  /* 顶部问候语样式 */
   .welcome{
     box-shadow: 2px 2px 7px -1px black;
     border-radius: 5px;
@@ -139,10 +150,12 @@ onMounted(() => {
     color: #fff;
     background: linear-gradient(to right, #4A88B1, #F3F2F9) no-repeat;
   }
+  /* 搜索栏区域样式 */
   .msg-search{
     width: 94%;
     margin-top: 20px;
   }
+  /* 表格容器样式 */
   #message{
     width: 94%;
     height: 100%;
@@ -151,6 +164,7 @@ onMounted(() => {
     align-items: center;
     margin-top: 20px;
   }
+  /* 表格标题样式 */
   .title-name{
     width: 100%;
     font-size: 20px;
@@ -159,26 +173,31 @@ onMounted(() => {
     color: #fff;
     background-color: #4A88B1;
   }
+  /* 表格主体区域 */
     .main-table{
       width: 100%;
       overflow: auto;
       height: 640px;
     }
+  /* 表格滚动条样式隐藏 */
     .main-table::-webkit-scrollbar {
       width: 0;
     }
+  /* 表格结构样式 */
     table{
       width: 100%;
       min-width: 1200px;
       border-collapse: collapse;
       table-layout:fixed;
     }
+  /* 表格每行样式 */
     tbody tr{
       height: 64px;
       text-align: center;
       font-size: 0.87rem;
       border-bottom: 1px solid #4A88B1;
     }
+  /* 单元格样式 */
     td{
       text-align: left;
       cursor: pointer;
@@ -189,6 +208,7 @@ onMounted(() => {
       padding: 0px 10px;
       overflow: hidden;
     }
+  /* 操作按钮容器 */
     .operate{
       color: #4A88B1;
       display: flex;
@@ -196,6 +216,7 @@ onMounted(() => {
       align-items: center;
       font-weight: 500;
     }
+  /* 同意按钮额外右间距 */
     .agree{
       margin-right: 10px;
     }
